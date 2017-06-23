@@ -73,6 +73,7 @@ while 1:
 		#read mqtt payload its mine
 		if MY_NODE_MAC_ADDR in sending_f:
 			print("#############Sending by Myself#########")
+			os.remove(MY_MQTT_QUEUE_FILE_PATH+sending_f)
 			continue
 		else:
 			print("Prepare to send data")
