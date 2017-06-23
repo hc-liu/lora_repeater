@@ -3,8 +3,13 @@
 import paho.mqtt.client as mqtt
 import json
 import sys
+import os 
 
-MY_SENDING_NODE="0000000005000095"
+MY_MQTT_QUEUE_FILE_PATH="/var/lora_repeater/queue/"
+MY_SENDING_FILE_PATH="/var/lora_repeater/sending/"
+MY_SENT_FILE_PATH="/var/lora_repeater/sent/"
+MY_SEND_FAIL_FILE_PATH="/var/lora_repeater/fail/"
+MY_LOG_FILE_PATH="/var/lora_repeater/log/"
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -23,16 +28,28 @@ def on_message(client, userdata, msg):
     sensor_data = json.loads(json_data)[0]['data']
     sensor_count = json.loads(json_data)[0]['frameCnt']
     
-    if sensor_mac == MY_SENDING_NODE:
-        print("#############Sending by Myself#########")
-    else:
-    	f = open("/var/mqtt/queue/"+sensor_mac+"-"+str(sensor_count), 'w')
-    	f.write(json_data)
-    	f.close
-    	print('data = ' + sensor_data)
+    f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
+    f.write(json_data)
+    f.close
+    print('data = ' + sensor_data)
+ 
+#start:    
+#make queue file folder
+if not os.path.exists(MY_MQTT_QUEUE_FILE_PATH):
+    os.makedirs(MY_MQTT_QUEUE_FILE_PATH)
+#make sending file folder    
+if not os.path.exists(MY_SENDING_FILE_PATH):
+    os.makedirs(MY_SENDING_FILE_PATH)
+#make sent file folder    
+if not os.path.exists(MY_SENT_FILE_PATH):
+    os.makedirs(MY_SENT_FILE_PATH)
+#make sending fail file folder    
+if not os.path.exists(MY_SEND_FAIL_FILE_PATH):
+    os.makedirs(MY_SEND_FAIL_FILE_PATH)            
+#make log file folder
+if not os.path.exists(MY_LOG_FILE_PATH):
+    os.makedirs(MY_LOG_FILE_PATH)  
     
-
-
 #clean_session=True, userdata=None, protocol=MQTTv311, transport="tcp"
 client = mqtt.Client(protocol=mqtt.MQTTv31)
 client.on_connect = on_connect
