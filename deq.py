@@ -38,6 +38,21 @@ def check_lora_module(dev_path):
 		return None
 
 #start:   
+#make queue file folder
+if not os.path.exists(MY_MQTT_QUEUE_FILE_PATH):
+	os.makedirs(MY_MQTT_QUEUE_FILE_PATH)
+#make sending file folder    
+if not os.path.exists(MY_SENDING_FILE_PATH):
+	os.makedirs(MY_SENDING_FILE_PATH)
+#make sent file folder    
+if not os.path.exists(MY_SENT_FILE_PATH):
+	os.makedirs(MY_SENT_FILE_PATH)
+#make sending fail file folder    
+if not os.path.exists(MY_SEND_FAIL_FILE_PATH):
+	os.makedirs(MY_SEND_FAIL_FILE_PATH)            
+#make log file folder
+if not os.path.exists(MY_LOG_FILE_PATH):
+	os.makedirs(MY_LOG_FILE_PATH)
 
 # Set up a specific logger with our desired output level
 my_logger = logging.getLogger('dequeue')
@@ -56,23 +71,6 @@ my_logger.info('I am started!')
 #my_logger.warn('warn message')
 #my_logger.error('error message')
 #my_logger.critical('critical message')
-
- 
-#make queue file folder
-if not os.path.exists(MY_MQTT_QUEUE_FILE_PATH):
-	os.makedirs(MY_MQTT_QUEUE_FILE_PATH)
-#make sending file folder    
-if not os.path.exists(MY_SENDING_FILE_PATH):
-	os.makedirs(MY_SENDING_FILE_PATH)
-#make sent file folder    
-if not os.path.exists(MY_SENT_FILE_PATH):
-	os.makedirs(MY_SENT_FILE_PATH)
-#make sending fail file folder    
-if not os.path.exists(MY_SEND_FAIL_FILE_PATH):
-	os.makedirs(MY_SEND_FAIL_FILE_PATH)            
-#make log file folder
-if not os.path.exists(MY_LOG_FILE_PATH):
-	os.makedirs(MY_LOG_FILE_PATH)  
 
 ser = check_lora_module(MY_SENDING_NODE_DEV0_PATH)
 if ser is None:
