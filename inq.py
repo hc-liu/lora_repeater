@@ -23,21 +23,24 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    #print(msg.topic+" "+str(msg.payload))
-    my_logger.info('Message incoming')
-    my_logger.info(msg.topic)
-    my_logger.info(msg.payload) 
-    json_data = msg.payload
-    sensor_mac = json.loads(json_data)[0]['macAddr']
-    sensor_data = json.loads(json_data)[0]['data']
-    sensor_count = json.loads(json_data)[0]['frameCnt']
+    try:
+    	#print(msg.topic+" "+str(msg.payload))
+    	my_logger.info('Message incoming')
+    	my_logger.info(msg.topic)
+    	my_logger.info(msg.payload) 
+    	json_data = msg.payload
+    	sensor_mac = json.loads(json_data)[0]['macAddr']
+    	sensor_data = json.loads(json_data)[0]['data']
+    	sensor_count = json.loads(json_data)[0]['frameCnt']
     
-    my_logger.info('Data is:')
-    my_logger.info(sensor_data)
-    f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
-    f.write(json_data)
-    f.close
-    #print('data = ' + sensor_data)
+    	my_logger.info('Data is:')
+    	my_logger.info(sensor_data)
+    	f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
+    	f.write(json_data)
+    	f.close
+    	#print('data = ' + sensor_data)
+    except:
+    	my_logger.error('Received a non-UTF8 msg')
  
 #start:  
 # Set up a specific logger with our desired output level
