@@ -10,6 +10,7 @@ MY_SENDING_NODE_DEV0_PATH="/dev/ttyUSB0"
 MY_SENDING_NODE_DEV1_PATH="/dev/ttyUSB1" 
 
 MY_SLEEP_INTERVAL=3
+MY_ALIVE_INTERVAL=30
    
 MY_MQTT_QUEUE_FILE_PATH="/var/lora_repeater/queue/"
 MY_SENDING_FILE_PATH="/var/lora_repeater/sending/"
@@ -17,6 +18,12 @@ MY_SENT_FILE_PATH="/var/lora_repeater/sent/"
 MY_SEND_FAIL_FILE_PATH="/var/lora_repeater/fail/"
 MY_LOG_FILE_PATH="/var/lora_repeater/log/"
 
+MY_NODE_MAC_ADDR=""
+MY_NODE_MAC_ADDR_SHORT=""
+
+GLOBAL_TIME_RUNNING=0
+GLOBAL_COUNT_SENT=0
+GLOBAL_COUNT_FAIL=0
 
 def check_lora_module(dev_path):
 	try:
@@ -54,16 +61,17 @@ if ser is None:
 else:   
 	print("Open LoRa node done:" + MY_SENDING_NODE_DEV0_PATH)   
 
-
-MY_NODE_MAC_ADDR=""
 #queue my Lora node mac address AT+SGMD?, return +SGMD:"040004C5","GLN0161400362"
+ser.flushInput()
+ser.flushOutput()
 ser.write("AT+SGMD?\n")
 return_state=ser.readlines()
 #print return_state
 
 matching = [s for s in return_state if "+SGMD:" in s]
 #print matching  #['+SGMD:"05000095","GLN0154700000"\r\n']
-MY_NODE_MAC_ADDR = "00000000"+matching[0][7:15]
+MY_NODE_MAC_ADDR_SHORT = matching[0][7:15]
+MY_NODE_MAC_ADDR = "00000000"+ MY_NODE_MAC_ADDR_SHORT
 print ("Check: My LoRa Node MAC Addr:" + MY_NODE_MAC_ADDR)
 
 while 1:  
@@ -90,19 +98,40 @@ while 1:
 		#return_state=ser.readlines()
 		#print(return_state)
 		time.sleep(MY_SLEEP_INTERVAL)
+		GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
 		print('Sending')
+		ser.flushInput()
+		ser.flushOutput()
 		ser.write(data_sending)
 		return_state=ser.readlines()
 		print(return_state)
 		if "OK\r\n" in return_state:
 			print("Result: SENT.")
+			GLOBAL_COUNT_SENT+=1
 			os.rename(MY_SENDING_FILE_PATH+sending_f, MY_SENT_FILE_PATH+sending_f)
 		else:
 			print("Result: FAIL! move to FAIL")
+			GLOBAL_COUNT_FAIL+=1
 			os.rename(MY_SENDING_FILE_PATH+sending_f, MY_SEND_FAIL_FILE_PATH+sending_f)
 	else:
 		print("Waiting for incoming queue")
 		time.sleep(MY_SLEEP_INTERVAL)
+		GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
+	
+	#print("in while loop")
+	if GLOBAL_TIME_RUNNING >= MY_ALIVE_INTERVAL:
+		#send alive command
+		time.sleep(MY_SLEEP_INTERVAL)
+		data_alive = MY_NODE_MAC_ADDR_SHORT + "E" +str(GLOBAL_COUNT_SENT) + "F" +str(GLOBAL_COUNT_FAIL)
+		data_alive_send = "AT+DTX=" + str (len(data_alive)) + "," + data_alive + "\n"
+		ser.flushInput()
+		ser.flushOutput()
+		ser.write(data_alive_send)
+		return_state=ser.readlines()
+		print(return_state)
+		GLOBAL_COUNT_SENT=0
+		GLOBAL_COUNT_FAIL=0
+		GLOBAL_TIME_RUNNING=0
 ser.close
    
 
