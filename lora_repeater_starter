@@ -1,0 +1,35 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          lora_repeater_starter
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Example initscript
+# Description:       This file should be used to construct scripts to be
+#                    placed in /etc/init.d.  This example start a
+#                    single forking daemon capable of writing a pid
+#                    file.  To get other behavoirs, implemend
+#                    do_start(), do_stop() or other functions to
+#                    override the defaults in /lib/init/init-d-script.
+### END INIT INFO
+
+case "$1" in
+  start)
+    echo "Starting Lora_Repeater inq and deq"
+    # run application you want to start
+    /usr/local/bin/inq &
+    /usr/local/bin/deq &
+    ;;
+  stop)
+    echo "Stopping Lora_Repeater inq and deq"
+    # kill application you want to stop
+    killall inq deq 
+    ;;
+  *)
+    echo "Usage: /etc/init.d/lora_repeater_starter{start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0

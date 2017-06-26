@@ -25,8 +25,8 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     #print(msg.topic+" "+str(msg.payload))
     my_logger.info('Message incoming')
-    #my_logger.info(msg.topic)
-    #my_logger.info(msg.payload) log will fail
+    my_logger.info(msg.topic)
+    my_logger.info(msg.payload) 
     json_data = msg.payload
     sensor_mac = json.loads(json_data)[0]['macAddr']
     sensor_data = json.loads(json_data)[0]['data']
@@ -56,7 +56,6 @@ my_logger.info('I am started!')
 #my_logger.warn('warn message')
 #my_logger.error('error message')
 #my_logger.critical('critical message')
-
   
 #make queue file folder
 if not os.path.exists(MY_MQTT_QUEUE_FILE_PATH):

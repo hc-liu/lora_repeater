@@ -91,11 +91,21 @@ else:
 #queue my Lora node mac address AT+SGMD?, return +SGMD:"040004C5","GLN0161400362"
 ser.flushInput()
 ser.flushOutput()
+time.sleep(MY_SLEEP_INTERVAL)
 ser.write("AT+SGMD?\n")
 my_logger.info('Write AT+SGMD?')
 return_state=ser.readlines()
-my_logger.info(return_state)
-#print return_state
+#time.sleep(MY_SLEEP_INTERVAL)
+#my_logger.info(return_state)
+print return_state
+
+if not return_state:
+	my_logger.error('return of AT+SGMD? is empty!, restart!')
+	ser.close
+	time.sleep(MY_SLEEP_INTERVAL)
+	os.execv(__file__, sys.argv)
+else:
+	my_logger.info(return_state)
 
 matching = [s for s in return_state if "+SGMD:" in s]
 #print matching  #['+SGMD:"05000095","GLN0154700000"\r\n']
