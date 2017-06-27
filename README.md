@@ -22,3 +22,8 @@ Installation step:
  - #mv /usr/local/bin/inq.py /usr/local/bin/inq; mv /usr/local/bin/deq.py /usr/local/bin/deq
  - #update-rc.d lora_repeater_stater defaults
  - #lora_repeater_stater start or reboot wil be run.
+ 
+ OR just 2 steps:
+ 1. #wget https://raw.githubusercontent.com/hc-liu/lora_repeater/master/setup.sh
+ 2. #chmod +x setup.sh ; ./setup.sh
+ 
