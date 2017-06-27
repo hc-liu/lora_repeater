@@ -27,3 +27,9 @@ Installation step:
  1. #wget https://raw.githubusercontent.com/hc-liu/lora_repeater/master/setup.sh
  2. #chmod +x setup.sh ; ./setup.sh
  
+References:
+1. https://stackoverflow.com/questions/7266558/pyserial-buffer-wont-flush
+2. http://www.itread01.com/articles/1476278427.html
+3. https://raspberrypi.stackexchange.com/questions/13358/insserv-warning-script-mathkernel-missing-lsb-tags-and-overrides
+
+
