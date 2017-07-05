@@ -127,18 +127,29 @@ while 1:
 		else:
 			#print("Prepare to send data")
 			my_logger.info('Prepare to send data')
-				
+		
+		#protection
 		os.rename(MY_MQTT_QUEUE_FILE_PATH+sending_f, MY_SENDING_FILE_PATH+sending_f)
+		my_logger.info('Rename File Done')
 		f = open(MY_SENDING_FILE_PATH+sending_f, 'r')
+		my_logger.info('Open File Done')
 		f_json_data = f.read()
+		my_logger.info('Read File Done')
 		f.close
+		my_logger.info('Close File Done')
 		sensor_data = str(json.loads(f_json_data)[0]['data'])
+		my_logger.info('DATA')
+		my_logger.info(sensor_data)
 		sensor_data_len = len(sensor_data)
+		my_logger.info('DATA Len')
+		my_logger.info(sensor_data_len)
+	
 		#print("sensor_data:" + sensor_data )
 		data_sending = "AT+DTX="+str(sensor_data_len)+","+sensor_data+"\n"
 		time.sleep(MY_SLEEP_INTERVAL)
 		GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
-		#print('Sending')
+		print('GLOBAL_TIME_RUNNING')
+		print(GLOBAL_TIME_RUNNING)
 		my_logger.info('Sending')
 		ser.flushInput()
 		ser.flushOutput()
