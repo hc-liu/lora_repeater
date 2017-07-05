@@ -26,6 +26,9 @@ Installation step:
  OR just 2 steps:
  1. #wget https://raw.githubusercontent.com/hc-liu/lora_repeater/master/setup.sh
  2. #chmod +x setup.sh ; ./setup.sh
+ 3. #cp check_repeater.sh /root
+ 4. #crontab -e
+ 5. add one line */1 * * * * /root/check_repeater.sh for each 1 min to check deq/ine processes
  
 References:
 1. https://stackoverflow.com/questions/7266558/pyserial-buffer-wont-flush
