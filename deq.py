@@ -29,6 +29,9 @@ GLOBAL_TIME_RUNNING=0
 GLOBAL_COUNT_SENT=0
 GLOBAL_COUNT_FAIL=0
 
+SENT_OK_TAG="Radio Tx Done\r\n"
+
+
 def check_lora_module(dev_path):
 	try:
 		ser = serial.Serial(dev_path, 9600, timeout=0.5)
@@ -89,45 +92,53 @@ else:
 #queue my Lora node mac address AT+SGMD?, return +SGMD:"040004C5","GLN0161400362"
 ser.flushInput()
 ser.flushOutput()
-time.sleep(MY_SLEEP_INTERVAL)
-ser.write("AT+SGMD?\n")
-my_logger.info('Write AT+SGMD?')
+# time.sleep(MY_SLEEP_INTERVAL)
+# #ser.write("AT+SGMD?\n")
+# ser.write("AT+CDEVADDR?\n")
+# my_logger.info('Write AT+CDEVADDR?')
 return_state=ser.readlines()
 #time.sleep(MY_SLEEP_INTERVAL)
 #my_logger.info(return_state)
-print return_state
+#print return_state
 
-if not return_state:
-	my_logger.error('return of AT+SGMD? is empty!, restart!')
-	ser.close
-	time.sleep(MY_SLEEP_INTERVAL)
-	os.execv(__file__, sys.argv)
-else:
-	my_logger.info(return_state)
-
-matching = [s for s in return_state if "+SGMD:" in s]
+# if not return_state:
+# 	my_logger.error('return of AT+CDEVADDR? is empty!, restart!')
+# 	ser.close
+# 	time.sleep(MY_SLEEP_INTERVAL)
+# 	os.execv(__file__, sys.argv)
+# else:
+# 	my_logger.info(return_state)
+# 
+# matching = [s for s in return_state if "+CDEVADDR:" in s]
 #print matching  #['+SGMD:"05000095","GLN0154700000"\r\n']
-MY_NODE_MAC_ADDR_SHORT = matching[0][7:15]
-MY_NODE_MAC_ADDR = "00000000"+ MY_NODE_MAC_ADDR_SHORT
-#print ("Check: My LoRa Node MAC Addr:" + MY_NODE_MAC_ADDR)
-my_logger.info('Check: My LoRa Node MAC Addr:')
-my_logger.info(MY_NODE_MAC_ADDR)
+#MY_NODE_MAC_ADDR_SHORT = matching[0][10:18]
+# starPosition = matching[0].index("+CDEVADDR:")
+# #print starPosition
+# starPosition = starPosition+len("+CDEVADDR:")
+# endPosition = starPosition+8
+# MY_NODE_MAC_ADDR_SHORT = matching[0][starPosition:endPosition]
+# #print MY_NODE_MAC_ADDR_SHORT
+# MY_NODE_MAC_ADDR = "00000000"+ MY_NODE_MAC_ADDR_SHORT
+# #print ("Check: My LoRa Node MAC Addr:" + MY_NODE_MAC_ADDR)
+# my_logger.info('Check: My LoRa Node MAC Addr:')
+# my_logger.info(MY_NODE_MAC_ADDR)
 
+my_dict = {}
 
 while 1:  
 	for sending_f in os.listdir(MY_MQTT_QUEUE_FILE_PATH):
 		#print sending_f
 		my_logger.info(sending_f)
 		#read mqtt payload its mine
-		if MY_NODE_MAC_ADDR in sending_f:
-			#print("#############Sending by Myself#########")
-			my_logger.info('#############Sending by Myself#########')
-			os.remove(MY_MQTT_QUEUE_FILE_PATH+sending_f)
-			continue
-		else:
-			#print("Prepare to send data")
-			my_logger.info('Prepare to send data')
-		
+		# if MY_NODE_MAC_ADDR in sending_f:
+# 			#print("#############Sending by Myself#########")
+# 			my_logger.info('#############Sending by Myself#########')
+# 			os.remove(MY_MQTT_QUEUE_FILE_PATH+sending_f)
+# 			continue
+# 		else:
+# 			#print("Prepare to send data")
+# 			my_logger.info('Prepare to send data')
+# 		
 		#protection
 		os.rename(MY_MQTT_QUEUE_FILE_PATH+sending_f, MY_SENDING_FILE_PATH+sending_f)
 		my_logger.info('Rename File Done')
@@ -138,6 +149,56 @@ while 1:
 		f.close
 		my_logger.info('Close File Done')
 		sensor_data = str(json.loads(f_json_data)[0]['data'])
+		sensor_macAddr = str(json.loads(f_json_data)[0]['macAddr'])
+		sensor_frameCnt = str(json.loads(f_json_data)[0]['frameCnt'])
+		nFrameCnt = json.loads(f_json_data)[0]['frameCnt']
+		#print my_dict
+		bSending = True;
+		if sensor_macAddr in my_dict:
+			nPrevFrameCnt = my_dict.get(sensor_macAddr)
+			if nFrameCnt == 1:
+				my_dict[sensor_macAddr] = 1
+				bSending = False
+			elif nFrameCnt == nPrevFrameCnt:
+				bSending = False
+			elif nFrameCnt > nPrevFrameCnt:
+				my_dict[sensor_macAddr] = nFrameCnt
+			elif nPrevFrameCnt-nFrameCnt > 10:
+				my_dict[sensor_macAddr] = nFrameCnt
+			else:
+				bSending = False
+			#print 'exist=' + sensor_macAddr
+		else:
+			my_dict[sensor_macAddr] = nFrameCnt
+			#print 'add=' + sensor_macAddr
+			if nFrameCnt == 1:
+				bSending = False
+		#print my_dict
+		if bSending is False:
+			my_logger.info('this package Can NOT be sent!')
+			continue
+		else:
+			my_logger.info('this package Will be sent!')
+		
+		my_logger.info('macAddr')
+		my_logger.info(sensor_macAddr[8:16])
+		sensor_nwkskey=""
+		sensor_appskey=""
+		#print(sensor_macAddr[8:10])
+		if "04" in sensor_macAddr[8:10]:
+			sensor_nwkskey = "43610A1F04719BB807A8073F8AECB131"
+			sensor_appskey = sensor_nwkskey
+		
+		if "05" in sensor_macAddr[8:10]:
+			sensor_nwkskey = "63D83C7F054A18D423BDFB712D8F4371"
+			sensor_appskey = sensor_nwkskey
+			
+		if "0d" in sensor_macAddr[8:10]:
+			sensor_nwkskey = "933C5ACB0D941ED1EC32DA7D9174C452"
+			sensor_appskey = sensor_nwkskey
+				
+		my_logger.info('frameCnt');
+		my_logger.info(sensor_frameCnt);
 		my_logger.info('DATA')
 		my_logger.info(sensor_data)
 		sensor_data_len = len(sensor_data)
@@ -145,11 +206,14 @@ while 1:
 		my_logger.info(sensor_data_len)
 	
 		#print("sensor_data:" + sensor_data )
-		data_sending = "AT+DTX="+str(sensor_data_len)+","+sensor_data+"\n"
+		#data_sending = "AT+DTX="+str(sensor_data_len)+","+sensor_data+"\n"
+		data_sending = "AT+SSTX="+str(sensor_data_len)+","+sensor_data+","+sensor_macAddr[8:16]+","+sensor_frameCnt+","+sensor_nwkskey+","+sensor_appskey+"\n"
+		my_logger.info(data_sending)
+		#print data_sending
 		time.sleep(MY_SLEEP_INTERVAL)
 		GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
-		print('GLOBAL_TIME_RUNNING')
-		print(GLOBAL_TIME_RUNNING)
+		#print('GLOBAL_TIME_RUNNING')
+		#print(GLOBAL_TIME_RUNNING)
 		my_logger.info('Sending')
 		ser.flushInput()
 		ser.flushOutput()
@@ -158,7 +222,7 @@ while 1:
 		return_state=ser.readlines()
 		#print(return_state)
 		my_logger.info(return_state)
-		if "OK\r\n" in return_state:
+		if SENT_OK_TAG in return_state:
 			#print("Result: SENT.")
 			my_logger.info('Result: SENT.')
 			GLOBAL_COUNT_SENT+=1
@@ -171,25 +235,25 @@ while 1:
 	else:
 		#print("Waiting for incoming queue")
 		time.sleep(MY_SLEEP_INTERVAL)
-		GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
+	#	GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
 	
 	#print("in while loop")
-	if GLOBAL_TIME_RUNNING >= MY_ALIVE_INTERVAL:
+# 	if GLOBAL_TIME_RUNNING >= MY_ALIVE_INTERVAL:
 		#send alive command
-		time.sleep(MY_SLEEP_INTERVAL)
-		data_alive = MY_NODE_MAC_ADDR_SHORT + "E" +str(GLOBAL_COUNT_SENT) + "F" +str(GLOBAL_COUNT_FAIL)
-		data_alive_send = "AT+DTX=" + str (len(data_alive)) + "," + data_alive + "\n"
-		ser.flushInput()
-		ser.flushOutput()
-		my_logger.info(data_alive_send)
-		ser.write(data_alive_send)
-		return_state=ser.readlines()
-		my_logger.info('Alive message')
-		my_logger.info(return_state)
-		#print(return_state)
-		GLOBAL_COUNT_SENT=0
-		GLOBAL_COUNT_FAIL=0
-		GLOBAL_TIME_RUNNING=0
+	# 	time.sleep(MY_SLEEP_INTERVAL)
+# 		data_alive = MY_NODE_MAC_ADDR_SHORT + "E" +str(GLOBAL_COUNT_SENT) + "F" +str(GLOBAL_COUNT_FAIL)
+# 		data_alive_send = "AT+DTX=" + str (len(data_alive)) + "," + data_alive + "\n"
+# 		ser.flushInput()
+# 		ser.flushOutput()
+# 		my_logger.info(data_alive_send)
+# 		ser.write(data_alive_send)
+# 		return_state=ser.readlines()
+# 		my_logger.info('Alive message')
+# 		my_logger.info(return_state)
+# 		#print(return_state)
+# 		GLOBAL_COUNT_SENT=0
+# 		GLOBAL_COUNT_FAIL=0
+# 		GLOBAL_TIME_RUNNING=0
 ser.close
    
 
