@@ -56,7 +56,7 @@ def on_message(client, userdata, msg):
     		elif nFrameCnt < 10:
     			bQueue = True
     			my_dict[sensor_mac] = nFrameCnt
-    		elif nPrevFrameCnt-nFrameCnt > 10:
+    		elif nFrameCnt-nPrevFrameCnt > 10:
     			bQueue = False
     		elif nFrameCnt > nPrevFrameCnt:
     			my_dict[sensor_mac] = nFrameCnt
