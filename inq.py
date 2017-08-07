@@ -16,7 +16,6 @@ MY_LOG_FILE_PATH="/var/lora_repeater/log/"
 MY_LOG_FILENAME = MY_LOG_FILE_PATH+"inq.log"
 
 my_dict = {}
-nPrevFrameCnt = 0
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -40,15 +39,15 @@ def on_message(client, userdata, msg):
     	my_logger.info('Data is:')
     	my_logger.info(sensor_data)
     	
-    	my_logger.info('prev frameCnt is:')
-    	my_logger.info(nPrevFrameCnt)
-    	
     	my_logger.info('now frameCnt is:')
     	my_logger.info(sensor_count)
     	
     	bQueue = True
     	if sensor_mac in my_dict:
     		nPrevFrameCnt = my_dict.get(sensor_mac)
+    		my_logger.info('prev frameCnt is:')
+    		my_logger.info(nPrevFrameCnt)
+    		
     		if nFrameCnt == 1:
     			my_dict[sensor_mac] = 1
     			bQueue = True
