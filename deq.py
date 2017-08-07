@@ -161,11 +161,11 @@ while 1:
 				bSending = False
 			elif nFrameCnt == nPrevFrameCnt:
 				bSending = False
-			elif nFrameCnt > nPrevFrameCnt:
-				my_dict[sensor_macAddr] = nFrameCnt
 			elif nPrevFrameCnt-nFrameCnt > 10:
 				my_dict[sensor_macAddr] = nFrameCnt
 				bSending = False
+			elif nFrameCnt > nPrevFrameCnt:
+				my_dict[sensor_macAddr] = nFrameCnt
 			else:
 				bSending = False
 			#print 'exist=' + sensor_macAddr
@@ -177,6 +177,7 @@ while 1:
 		#print my_dict
 		if bSending is False:
 			my_logger.info('this package Can NOT be sent!')
+			os.remove(MY_SENDING_FILE_PATH+sending_f)
 			continue
 		else:
 			my_logger.info('this package Will be sent!')
