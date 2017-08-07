@@ -165,6 +165,7 @@ while 1:
 				my_dict[sensor_macAddr] = nFrameCnt
 			elif nPrevFrameCnt-nFrameCnt > 10:
 				my_dict[sensor_macAddr] = nFrameCnt
+				bSending = False
 			else:
 				bSending = False
 			#print 'exist=' + sensor_macAddr

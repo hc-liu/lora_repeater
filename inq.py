@@ -32,13 +32,47 @@ def on_message(client, userdata, msg):
     	sensor_mac = json.loads(json_data)[0]['macAddr']
     	sensor_data = json.loads(json_data)[0]['data']
     	sensor_count = json.loads(json_data)[0]['frameCnt']
-    
+    	nFrameCnt = json.loads(json_data)[0]['frameCnt']
+    	
     	my_logger.info('Data is:')
     	my_logger.info(sensor_data)
-    	f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
-    	f.write(json_data)
-    	f.close
-    	#print('data = ' + sensor_data)
+    	
+    	my_logger.info('previous frameCnt:')
+    	my_logger.info(nPrevFrameCnt)
+    	my_logger.info('Now crameCnt is:')
+    	my_logger.info(sensor_count)
+    	
+    	bQueue = True;
+		if sensor_mac in my_dict:
+			nPrevFrameCnt = my_dict.get(sensor_mac)
+			if nFrameCnt == 1:
+				my_dict[sensor_mac] = 1
+				bQueue = True
+			elif nFrameCnt == nPrevFrameCnt:
+				bQueue = False
+			elif nFrameCnt < 10
+				bQueue = True
+				my_dict[sensor_mac] = nFrameCnt
+			elif nPrevFrameCnt-nFrameCnt > 10:
+				bQueue = False
+			elif nFrameCnt > nPrevFrameCnt:
+				my_dict[sensor_mac] = nFrameCnt
+				bQueue = True
+			else:
+				bQueue = False
+		else:
+			my_dict[sensor_mac] = nFrameCnt
+			if nFrameCnt == 1:
+				bQueue = False
+		if bQueue is False:
+			my_logger.info('this package Can NOT be queue!')
+			continue
+		else:
+			my_logger.info('this package Will be queue!')
+			f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
+			f.write(json_data)
+			f.close
+			#print('data = ' + sensor_data)
     except:
     	my_logger.error('Received a non-UTF8 msg')
  
@@ -75,7 +109,10 @@ my_logger.info('I am started!')
 #my_logger.warn('warn message')
 #my_logger.error('error message')
 #my_logger.critical('critical message')
- 
+
+my_dict = {}
+nPrevFrameCnt = 0
+
 #clean_session=True, userdata=None, protocol=MQTTv311, transport="tcp"
 client = mqtt.Client(protocol=mqtt.MQTTv31)
 client.on_connect = on_connect
