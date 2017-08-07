@@ -50,7 +50,7 @@ def on_message(client, userdata, msg):
     			bQueue = True
     		elif nFrameCnt == nPrevFrameCnt:
     			bQueue = False
-    		elif nFrameCnt < 10
+    		elif nFrameCnt < 10:
     			bQueue = True
     			my_dict[sensor_mac] = nFrameCnt
     		elif nPrevFrameCnt-nFrameCnt > 10:
@@ -66,7 +66,6 @@ def on_message(client, userdata, msg):
     			bQueue = False
     	if bQueue is False:
     		my_logger.info('this package Can NOT be queue!')
-    		continue
     	else:
     		my_logger.info('this package Will be queue!')
     		f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
