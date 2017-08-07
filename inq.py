@@ -62,8 +62,8 @@ def on_message(client, userdata, msg):
     			bQueue = False
     	else:
     		my_dict[sensor_mac] = nFrameCnt
-    		if nFrameCnt == 1:
-    			bQueue = False
+    		bQueue = True
+    		
     	if bQueue is False:
     		my_logger.info('this package Can NOT be queue!')
     	else:
