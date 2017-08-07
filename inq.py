@@ -44,35 +44,35 @@ def on_message(client, userdata, msg):
     	
     	bQueue = True
     	if sensor_mac in my_dict:
-			nPrevFrameCnt = my_dict.get(sensor_mac)
-			if nFrameCnt == 1:
-				my_dict[sensor_mac] = 1
-				bQueue = True
-			elif nFrameCnt == nPrevFrameCnt:
-				bQueue = False
-			elif nFrameCnt < 10
-				bQueue = True
-				my_dict[sensor_mac] = nFrameCnt
-			elif nPrevFrameCnt-nFrameCnt > 10:
-				bQueue = False
-			elif nFrameCnt > nPrevFrameCnt:
-				my_dict[sensor_mac] = nFrameCnt
-				bQueue = True
-			else:
-				bQueue = False
-		else:
-			my_dict[sensor_mac] = nFrameCnt
-			if nFrameCnt == 1:
-				bQueue = False
-		if bQueue is False:
-			my_logger.info('this package Can NOT be queue!')
-			continue
-		else:
-			my_logger.info('this package Will be queue!')
-			f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
-			f.write(json_data)
-			f.close
-			#print('data = ' + sensor_data)
+    		nPrevFrameCnt = my_dict.get(sensor_mac)
+    		if nFrameCnt == 1:
+    			my_dict[sensor_mac] = 1
+    			bQueue = True
+    		elif nFrameCnt == nPrevFrameCnt:
+    			bQueue = False
+    		elif nFrameCnt < 10
+    			bQueue = True
+    			my_dict[sensor_mac] = nFrameCnt
+    		elif nPrevFrameCnt-nFrameCnt > 10:
+    			bQueue = False
+    		elif nFrameCnt > nPrevFrameCnt:
+    			my_dict[sensor_mac] = nFrameCnt
+    			bQueue = True
+    		else:
+    			bQueue = False
+    	else:
+    		my_dict[sensor_mac] = nFrameCnt
+    		if nFrameCnt == 1:
+    			bQueue = False
+    	if bQueue is False:
+    		my_logger.info('this package Can NOT be queue!')
+    		continue
+    	else:
+    		my_logger.info('this package Will be queue!')
+    		f = open(MY_MQTT_QUEUE_FILE_PATH+sensor_mac+"-"+str(sensor_count), 'w')
+    		f.write(json_data)
+    		f.close
+    		#print('data = ' + sensor_data)
     except:
     	my_logger.error('Received a non-UTF8 msg')
  
