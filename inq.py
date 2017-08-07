@@ -15,6 +15,9 @@ MY_LOG_FILE_PATH="/var/lora_repeater/log/"
 
 MY_LOG_FILENAME = MY_LOG_FILE_PATH+"inq.log"
 
+my_dict = {}
+nPrevFrameCnt = 0
+
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     #print("Connected with result code "+str(rc))
@@ -37,9 +40,10 @@ def on_message(client, userdata, msg):
     	my_logger.info('Data is:')
     	my_logger.info(sensor_data)
     	
-    	my_logger.info('previous frameCnt:')
+    	my_logger.info('prev frameCnt is:')
     	my_logger.info(nPrevFrameCnt)
-    	my_logger.info('Now crameCnt is:')
+    	
+    	my_logger.info('now frameCnt is:')
     	my_logger.info(sensor_count)
     	
     	bQueue = True
@@ -108,9 +112,6 @@ my_logger.info('I am started!')
 #my_logger.warn('warn message')
 #my_logger.error('error message')
 #my_logger.critical('critical message')
-
-my_dict = {}
-nPrevFrameCnt = 0
 
 #clean_session=True, userdata=None, protocol=MQTTv311, transport="tcp"
 client = mqtt.Client(protocol=mqtt.MQTTv31)
