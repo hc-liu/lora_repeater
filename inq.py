@@ -42,8 +42,8 @@ def on_message(client, userdata, msg):
     	my_logger.info('Now crameCnt is:')
     	my_logger.info(sensor_count)
     	
-    	bQueue = True;
-		if sensor_mac in my_dict:
+    	bQueue = True
+    	if sensor_mac in my_dict:
 			nPrevFrameCnt = my_dict.get(sensor_mac)
 			if nFrameCnt == 1:
 				my_dict[sensor_mac] = 1
