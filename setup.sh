@@ -2,7 +2,8 @@
 
 echo "installing system required packages";
 apt-get install -y mosquitto python-pip;
-pip install paho-mqtt python-etcd pyserial;
+pip install --upgrade pip;
+pip install paho-mqtt python-etcd pyserial PyMySql;
 
 echo "installing lora_repeater package";
 git clone https://github.com/hc-liu/lora_repeater.git;
