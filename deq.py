@@ -47,7 +47,7 @@ def check_lora_module(dev_path):
         ser.write("AT\n")
         check_my_dongle = ser.readlines()
         if any(REPLY_OK_STRING in s for s in check_my_dongle):
-            print "My USB dongle checked"
+            my_logger.info('My USB dongle checked')
             return ser
         else:
             return None
@@ -113,11 +113,12 @@ for devPath in USB_DEV_ARRAY:
         continue
     else:
         global_check_dongle_exist = True
-        print "Open LoRa node done:" + devPath
+        my_logger.info('Open LoRa node done:')
+        my_logger.info(devPath)
         break
 
 if global_check_dongle_exist is False:
-    print "no device be detected, exit!!!"
+    my_logger.error('no device be detected, exit!!!')
     sys.exit()
 
 # queue my Lora node mac address AT+SGMD?, return +SGMD:"040004C5","GLN0161400362"
