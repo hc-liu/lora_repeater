@@ -112,6 +112,7 @@ for devPath in USB_DEV_ARRAY:
         continue
     else:
         print "Open LoRa node done:" + devPath
+        break
 
 # sys.exit()
 
