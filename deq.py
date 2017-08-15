@@ -119,8 +119,9 @@ my_logger.info('I am started!')
 my_dict_appskey = {}
 my_dict_nwkskey = {}
 
-build_app_group_table
+build_app_group_table()
 
+print 'dic - appskey and nwkskey'
 print my_dict_appskey
 print my_dict_nwkskey
 
