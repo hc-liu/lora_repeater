@@ -10,6 +10,9 @@ from logging.handlers import RotatingFileHandler
 
 MY_SENDING_NODE_DEV0_PATH = "/dev/ttyUSB0"
 MY_SENDING_NODE_DEV1_PATH = "/dev/ttyUSB1"
+MY_SENDING_NODE_DEV2_PATH = "/dev/ttyUSB2"
+MY_SENDING_NODE_DEV3_PATH = "/dev/ttyUSB3"
+MY_SENDING_NODE_DEV4_PATH = "/dev/ttyUSB4"
 
 MY_SLEEP_INTERVAL = 3
 MY_ALIVE_INTERVAL = 60
@@ -30,12 +33,22 @@ GLOBAL_COUNT_SENT = 0
 GLOBAL_COUNT_FAIL = 0
 
 SENT_OK_TAG = "Radio Tx Done\r\n"
+REPLY_OK_STRING = "OK\r\n\r\n"
 
 
 def check_lora_module(dev_path):
     try:
         ser = serial.Serial(dev_path, 9600, timeout=0.5)
-        return ser
+        ser.flushInput()
+        ser.flushOutput()
+        check_my_dongle = ser.readlines()
+        ser.write("AT\n")
+        check_my_dongle = ser.readlines()
+        if REPLY_OK_STRING in check_my_dongle:
+            print check_my_dongle
+            return ser
+        else:
+            return None
     except serial.serialutil.SerialException:
         # print 'FAIL: Cannot open Serial Port (No LoRa Node Inserted)'
         return None
@@ -169,7 +182,7 @@ while 1:
                 my_dict[sensor_macAddr] = nFrameCnt
             else:
                 bSending = False
-            # print 'exist=' + sensor_macAddr
+                # print 'exist=' + sensor_macAddr
         else:
             my_dict[sensor_macAddr] = nFrameCnt
             # print 'add=' + sensor_macAddr
@@ -239,12 +252,12 @@ while 1:
     else:
         # print("Waiting for incoming queue")
         time.sleep(MY_SLEEP_INTERVAL)
-    #	GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
+        #	GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
 
-    # print("in while loop")
-    # 	if GLOBAL_TIME_RUNNING >= MY_ALIVE_INTERVAL:
-    # send alive command
-    # 	time.sleep(MY_SLEEP_INTERVAL)
+        # print("in while loop")
+        # 	if GLOBAL_TIME_RUNNING >= MY_ALIVE_INTERVAL:
+        # send alive command
+        # 	time.sleep(MY_SLEEP_INTERVAL)
 # data_alive = MY_NODE_MAC_ADDR_SHORT + "E" +str(GLOBAL_COUNT_SENT) + "F" +str(GLOBAL_COUNT_FAIL)
 # 		data_alive_send = "AT+DTX=" + str (len(data_alive)) + "," + data_alive + "\n"
 # 		ser.flushInput()
