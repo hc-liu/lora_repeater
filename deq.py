@@ -14,6 +14,8 @@ MY_SENDING_NODE_DEV2_PATH = "/dev/ttyUSB2"
 MY_SENDING_NODE_DEV3_PATH = "/dev/ttyUSB3"
 MY_SENDING_NODE_DEV4_PATH = "/dev/ttyUSB4"
 
+USB_DEV_ARRAY = ["/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3", "/dev/ttyUSB4"]
+
 MY_SLEEP_INTERVAL = 3
 MY_ALIVE_INTERVAL = 60
 
@@ -33,7 +35,7 @@ GLOBAL_COUNT_SENT = 0
 GLOBAL_COUNT_FAIL = 0
 
 SENT_OK_TAG = "Radio Tx Done\r\n"
-REPLY_OK_STRING = "OK\r\n\r\n"
+REPLY_OK_STRING = "OK"
 
 
 def check_lora_module(dev_path):
@@ -44,8 +46,8 @@ def check_lora_module(dev_path):
         check_my_dongle = ser.readlines()
         ser.write("AT\n")
         check_my_dongle = ser.readlines()
-        if REPLY_OK_STRING in check_my_dongle:
-            print check_my_dongle
+        if any(REPLY_OK_STRING in s for s in check_my_dongle):
+            print "My USB dongle checked"
             return ser
         else:
             return None
@@ -89,19 +91,24 @@ my_logger.info('I am started!')
 # my_logger.error('error message')
 # my_logger.critical('critical message')
 
-ser = check_lora_module(MY_SENDING_NODE_DEV0_PATH)
-if ser is None:
-    ser = check_lora_module(MY_SENDING_NODE_DEV1_PATH)
-    if ser is None:
-        # print 'FAIL to connect LoRa node!'
-        my_logger.error('FAIL to connect LoRa node!')
-        sys.exit()
-    else:
-        # print("Open LoRa node done:" + MY_SENDING_NODE_DEV1_PATH)
-        my_logger.info('Open LoRa node done: /dev/ttyUSB0')
-else:
-    # print("Open LoRa node done:" + MY_SENDING_NODE_DEV0_PATH)
-    my_logger.info('Open LoRa node done: /dev/ttyUSB1')
+# ser = check_lora_module(MY_SENDING_NODE_DEV0_PATH)
+# if ser is None:
+#     ser = check_lora_module(MY_SENDING_NODE_DEV1_PATH)
+#     if ser is None:
+#         # print 'FAIL to connect LoRa node!'
+#         my_logger.error('FAIL to connect LoRa node!')
+#         sys.exit()
+#     else:
+#         # print("Open LoRa node done:" + MY_SENDING_NODE_DEV1_PATH)
+#         my_logger.info('Open LoRa node done: /dev/ttyUSB0')
+# else:
+#     # print("Open LoRa node done:" + MY_SENDING_NODE_DEV0_PATH)
+#     my_logger.info('Open LoRa node done: /dev/ttyUSB1')
+
+for i, pathName in USB_DEV_ARRAY:
+    print i, pathName
+
+sys.exit()
 
 # queue my Lora node mac address AT+SGMD?, return +SGMD:"040004C5","GLN0161400362"
 ser.flushInput()
