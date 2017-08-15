@@ -6,6 +6,8 @@ import sys
 import time
 import serial
 import logging
+import pymysql.cursors
+
 from logging.handlers import RotatingFileHandler
 
 MY_SENDING_NODE_DEV0_PATH = "/dev/ttyUSB0"
@@ -36,6 +38,36 @@ GLOBAL_COUNT_FAIL = 0
 
 SENT_OK_TAG = "Radio Tx Done\r\n"
 REPLY_OK_STRING = "OK"
+
+
+def build_app_group_table():
+    # Connect to the database
+    connection = pymysql.connect(host='localhost',
+                                 user='lora',
+                                 password='lora',
+                                 db='lora',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+
+    try:
+        with connection.cursor() as cursor:
+            # Read a single record
+            # sql = "SELECT `id`, `password` FROM `users` WHERE `email`=%s"
+            sql = "SELECT netid_group, appskey, nwkskey  FROM table_netid"
+            cursor.execute(sql)
+            for row in cursor:
+                print (" ----------- ")
+                #print("Row: ", row)
+                my_dict_appskey[row["netid_group"]] = row["appskey"]
+                my_dict_nwkskey[row["netid_group"]] = row["nwkskey"]
+                print ("netid_group: ", row["netid_group"])
+                print ("appskey: ", row["appskey"])
+                print ("nwkskey: ", row["nwkskey"])
+
+                # result = cursor.fetchall()
+                # print(result)
+    finally:
+        connection.close()
 
 
 def check_lora_module(dev_path):
@@ -83,6 +115,14 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 my_logger.addHandler(handler)
 my_logger.info('I am started!')
+
+my_dict_appskey = {}
+my_dict_nwkskey = {}
+
+build_app_group_table
+
+print my_dict_appskey
+print my_dict_nwkskey
 
 # example
 # my_logger.debug('debug message')
@@ -154,7 +194,6 @@ return_state = ser.readlines()
 # #print ("Check: My LoRa Node MAC Addr:" + MY_NODE_MAC_ADDR)
 # my_logger.info('Check: My LoRa Node MAC Addr:')
 # my_logger.info(MY_NODE_MAC_ADDR)
-
 my_dict = {}
 
 while 1:

@@ -5,7 +5,7 @@ connection = pymysql.connect(host='localhost',
                              user='lora',
                              password='lora',
                              db='lora',
-                             charset='utf8mb4',
+                             #charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 
 try:
@@ -14,7 +14,13 @@ try:
         #sql = "SELECT `id`, `password` FROM `users` WHERE `email`=%s"
         sql = "SELECT netid_group, appskey, nwkskey  FROM table_netid"
         cursor.execute(sql)
-        result = cursor.fetchone()
-        print(result)
+        for row in cursor:
+                print (" ----------- ")
+                print("Row: ", row)
+                print ("netid_group: ", row["netid_group"])
+                print ("appskey: ", row["appskey"])
+                print ("appskey: ", row["appskey"])
+        #result = cursor.fetchall()
+        #print(result)
 finally:
     connection.close()
