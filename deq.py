@@ -56,14 +56,13 @@ def build_app_group_table():
             sql = "SELECT netid_group, appskey, nwkskey  FROM table_netid"
             cursor.execute(sql)
             for row in cursor:
-                print (" ----------- ")
-                #print("Row: ", row)
+                # print (" ----------- ")
+                # print("Row: ", row)
                 my_dict_appskey[row["netid_group"]] = row["appskey"]
                 my_dict_nwkskey[row["netid_group"]] = row["nwkskey"]
-                print ("netid_group: ", row["netid_group"])
-                print ("appskey: ", row["appskey"])
-                print ("nwkskey: ", row["nwkskey"])
-
+                # print ("netid_group: ", row["netid_group"])
+                # print ("appskey: ", row["appskey"])
+                # print ("nwkskey: ", row["nwkskey"])
                 # result = cursor.fetchall()
                 # print(result)
     finally:
@@ -121,9 +120,9 @@ my_dict_nwkskey = {}
 
 build_app_group_table()
 
-print 'dic - appskey and nwkskey'
-print my_dict_appskey
-print my_dict_nwkskey
+my_logger.info('dic - appskey and nwkskey')
+my_logger.info(my_dict_appskey)
+my_logger.info(my_dict_nwkskey)
 
 # example
 # my_logger.debug('debug message')
@@ -247,29 +246,36 @@ while 1:
             if nFrameCnt == 1:
                 bSending = False
         # print my_dict
+        my_logger.info('macAddr')
+        my_logger.info(sensor_macAddr[8:16])
+        sensor_nwkskey = ""
+        sensor_appskey = ""
+        # print(sensor_macAddr[8:10])
+        # if "04" in sensor_macAddr[8:10]:
+        #     sensor_nwkskey = "43610A1F04719BB807A8073F8AECB131"
+        #     sensor_appskey = sensor_nwkskey
+        #
+        # if "05" in sensor_macAddr[8:10]:
+        #     sensor_nwkskey = "63D83C7F054A18D423BDFB712D8F4371"
+        #     sensor_appskey = sensor_nwkskey
+        #
+        # if "0d" in sensor_macAddr[8:10]:
+        #     sensor_nwkskey = "933C5ACB0D941ED1EC32DA7D9174C452"
+        #     sensor_appskey = sensor_nwkskey
+
+        if sensor_macAddr[8:10] in my_dict_appskey:
+            sensor_nwkskey = my_dict_nwkskey[sensor_macAddr[8:10]]
+            sensor_appskey = my_dict_appskey[sensor_macAddr[8:10]]
+        else:
+            my_logger.info('Not in ABP Group Config Rule, so give up')
+            bSending = False
+
         if bSending is False:
             my_logger.info('this package Can NOT be sent!')
             os.remove(MY_SENDING_FILE_PATH + sending_f)
             continue
         else:
             my_logger.info('this package Will be sent!')
-
-        my_logger.info('macAddr')
-        my_logger.info(sensor_macAddr[8:16])
-        sensor_nwkskey = ""
-        sensor_appskey = ""
-        # print(sensor_macAddr[8:10])
-        if "04" in sensor_macAddr[8:10]:
-            sensor_nwkskey = "43610A1F04719BB807A8073F8AECB131"
-            sensor_appskey = sensor_nwkskey
-
-        if "05" in sensor_macAddr[8:10]:
-            sensor_nwkskey = "63D83C7F054A18D423BDFB712D8F4371"
-            sensor_appskey = sensor_nwkskey
-
-        if "0d" in sensor_macAddr[8:10]:
-            sensor_nwkskey = "933C5ACB0D941ED1EC32DA7D9174C452"
-            sensor_appskey = sensor_nwkskey
 
         my_logger.info('frameCnt');
         my_logger.info(sensor_frameCnt);
