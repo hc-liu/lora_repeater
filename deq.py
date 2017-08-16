@@ -10,12 +10,6 @@ import pymysql.cursors
 
 from logging.handlers import RotatingFileHandler
 
-MY_SENDING_NODE_DEV0_PATH = "/dev/ttyUSB0"
-MY_SENDING_NODE_DEV1_PATH = "/dev/ttyUSB1"
-MY_SENDING_NODE_DEV2_PATH = "/dev/ttyUSB2"
-MY_SENDING_NODE_DEV3_PATH = "/dev/ttyUSB3"
-MY_SENDING_NODE_DEV4_PATH = "/dev/ttyUSB4"
-
 USB_DEV_ARRAY = ["/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3", "/dev/ttyUSB4"]
 
 MY_SLEEP_INTERVAL = 3
@@ -56,15 +50,8 @@ def build_app_group_table():
             sql = "SELECT netid_group, appskey, nwkskey  FROM table_netid"
             cursor.execute(sql)
             for row in cursor:
-                # print (" ----------- ")
-                # print("Row: ", row)
                 my_dict_appskey[row["netid_group"]] = row["appskey"]
                 my_dict_nwkskey[row["netid_group"]] = row["nwkskey"]
-                # print ("netid_group: ", row["netid_group"])
-                # print ("appskey: ", row["appskey"])
-                # print ("nwkskey: ", row["nwkskey"])
-                # result = cursor.fetchall()
-                # print(result)
     finally:
         connection.close()
 
@@ -130,20 +117,6 @@ my_logger.info(my_dict_nwkskey)
 # my_logger.warn('warn message')
 # my_logger.error('error message')
 # my_logger.critical('critical message')
-
-# ser = check_lora_module(MY_SENDING_NODE_DEV0_PATH)
-# if ser is None:
-#     ser = check_lora_module(MY_SENDING_NODE_DEV1_PATH)
-#     if ser is None:
-#         # print 'FAIL to connect LoRa node!'
-#         my_logger.error('FAIL to connect LoRa node!')
-#         sys.exit()
-#     else:
-#         # print("Open LoRa node done:" + MY_SENDING_NODE_DEV1_PATH)
-#         my_logger.info('Open LoRa node done: /dev/ttyUSB0')
-# else:
-#     # print("Open LoRa node done:" + MY_SENDING_NODE_DEV0_PATH)
-#     my_logger.info('Open LoRa node done: /dev/ttyUSB1')
 
 global_check_dongle_exist = False
 for devPath in USB_DEV_ARRAY:
@@ -217,7 +190,7 @@ while 1:
         my_logger.info('Open File Done')
         f_json_data = f.read()
         my_logger.info('Read File Done')
-        f.close
+        f.close()
         my_logger.info('Close File Done')
         sensor_data = str(json.loads(f_json_data)[0]['data'])
         sensor_macAddr = str(json.loads(f_json_data)[0]['macAddr'])
@@ -277,8 +250,8 @@ while 1:
         else:
             my_logger.info('this package Will be sent!')
 
-        my_logger.info('frameCnt');
-        my_logger.info(sensor_frameCnt);
+        my_logger.info('frameCnt')
+        my_logger.info(sensor_frameCnt)
         my_logger.info('DATA')
         my_logger.info(sensor_data)
         sensor_data_len = len(sensor_data)
@@ -287,8 +260,8 @@ while 1:
 
         # print("sensor_data:" + sensor_data )
         # data_sending = "AT+DTX="+str(sensor_data_len)+","+sensor_data+"\n"
-        data_sending = "AT+SSTX=" + str(sensor_data_len) + "," + sensor_data + "," + sensor_macAddr[
-                                                                                     8:16] + "," + sensor_frameCnt + "," + sensor_nwkskey + "," + sensor_appskey + "\n"
+        data_sending = "AT+SSTX=" + str(sensor_data_len) + "," + sensor_data + "," + sensor_macAddr[8:16] + "," + sensor_frameCnt + "," + sensor_nwkskey + "," + sensor_appskey + "\n"
+        data_sending = str(data_sending)
         my_logger.info(data_sending)
         # print data_sending
         time.sleep(MY_SLEEP_INTERVAL)
