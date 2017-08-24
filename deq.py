@@ -14,7 +14,7 @@ USB_DEV_ARRAY = ["/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3",
                  "/dev/ttyUSB6"]
 
 MY_SLEEP_INTERVAL = 3
-MY_ALIVE_INTERVAL = 10
+MY_ALIVE_INTERVAL = 86400
 
 MY_MQTT_QUEUE_FILE_PATH = "/var/lora_repeater/queue/"
 MY_SENDING_FILE_PATH = "/var/lora_repeater/sending/"
