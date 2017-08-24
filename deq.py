@@ -10,10 +10,11 @@ import pymysql.cursors
 
 from logging.handlers import RotatingFileHandler
 
-USB_DEV_ARRAY = ["/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3", "/dev/ttyUSB4"]
+USB_DEV_ARRAY = ["/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3", "/dev/ttyUSB4", "/dev/ttyUSB5",
+                 "/dev/ttyUSB6"]
 
 MY_SLEEP_INTERVAL = 3
-MY_ALIVE_INTERVAL = 60
+MY_ALIVE_INTERVAL = 10
 
 MY_MQTT_QUEUE_FILE_PATH = "/var/lora_repeater/queue/"
 MY_SENDING_FILE_PATH = "/var/lora_repeater/sending/"
@@ -260,7 +261,8 @@ while 1:
 
         # print("sensor_data:" + sensor_data )
         # data_sending = "AT+DTX="+str(sensor_data_len)+","+sensor_data+"\n"
-        data_sending = "AT+SSTX=" + str(sensor_data_len) + "," + sensor_data + "," + sensor_macAddr[8:16] + "," + sensor_frameCnt + "," + sensor_nwkskey + "," + sensor_appskey + "\n"
+        data_sending = "AT+SSTX=" + str(sensor_data_len) + "," + sensor_data + "," + sensor_macAddr[
+                                                                                     8:16] + "," + sensor_frameCnt + "," + sensor_nwkskey + "," + sensor_appskey + "\n"
         data_sending = str(data_sending)
         my_logger.info(data_sending)
         # print data_sending
@@ -289,23 +291,23 @@ while 1:
     else:
         # print("Waiting for incoming queue")
         time.sleep(MY_SLEEP_INTERVAL)
-        #	GLOBAL_TIME_RUNNING+=MY_SLEEP_INTERVAL
+        GLOBAL_TIME_RUNNING += MY_SLEEP_INTERVAL
 
         # print("in while loop")
-        # 	if GLOBAL_TIME_RUNNING >= MY_ALIVE_INTERVAL:
-        # send alive command
-        # 	time.sleep(MY_SLEEP_INTERVAL)
-# data_alive = MY_NODE_MAC_ADDR_SHORT + "E" +str(GLOBAL_COUNT_SENT) + "F" +str(GLOBAL_COUNT_FAIL)
-# 		data_alive_send = "AT+DTX=" + str (len(data_alive)) + "," + data_alive + "\n"
-# 		ser.flushInput()
-# 		ser.flushOutput()
-# 		my_logger.info(data_alive_send)
-# 		ser.write(data_alive_send)
-# 		return_state=ser.readlines()
-# 		my_logger.info('Alive message')
-# 		my_logger.info(return_state)
-# 		#print(return_state)
-# 		GLOBAL_COUNT_SENT=0
-# 		GLOBAL_COUNT_FAIL=0
-# 		GLOBAL_TIME_RUNNING=0
+        if GLOBAL_TIME_RUNNING >= MY_ALIVE_INTERVAL:
+            # send alive command
+            # time.sleep(MY_SLEEP_INTERVAL)
+            # data_alive = MY_NODE_MAC_ADDR_SHORT + "E" +str(GLOBAL_COUNT_SENT) + "F" +str(GLOBAL_COUNT_FAIL)
+            # 		data_alive_send = "AT+DTX=" + str (len(data_alive)) + "," + data_alive + "\n"
+            ser.flushInput()
+            ser.flushOutput()
+            my_logger.info("alive")
+            ser.write("AT+DTTX\n")
+            return_state = ser.readlines()
+            # 		my_logger.info('Alive message')
+            my_logger.info(return_state)
+            # 		#print(return_state)
+            # 		GLOBAL_COUNT_SENT=0
+            # 		GLOBAL_COUNT_FAIL=0
+            GLOBAL_TIME_RUNNING = 0
 ser.close
