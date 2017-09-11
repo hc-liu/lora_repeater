@@ -10,7 +10,7 @@ else
 	echo "inq is running."
 fi
 
-totalNum=`ps cax | grep deq | wc -l`
+totalNumD=`ps cax | grep deq | wc -l`
 
 echo $totalNumD
 if [ $totalNumD -eq 0 ] ; then
