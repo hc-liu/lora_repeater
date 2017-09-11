@@ -121,7 +121,7 @@ my_logger.info(my_dict_nwkskey)
 
 global_check_dongle_exist = False
 for devPath in USB_DEV_ARRAY:
-    print devPath
+    #print devPath
     ser = check_lora_module(devPath)
     if ser is None:
         continue
