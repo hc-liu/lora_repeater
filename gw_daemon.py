@@ -53,6 +53,7 @@ def on_message(client, userdata, msg):
 
         print('Data is:')
         print(sensor_data)
+        print(sensor_data)
 
         print('now frameCnt is:')
         print(sensor_count)
