@@ -1,6 +1,7 @@
 #!/bin/sh
 
 echo "installing system required packages";
+apt-get update;
 apt-get install -y mosquitto python-pip;
 pip install --upgrade pip;
 pip install paho-mqtt python-etcd pyserial PyMySql;
